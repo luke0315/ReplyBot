@@ -1,7 +1,13 @@
 import discord
+import pymongo
+from pymongo.database import Database
+import db_controller as db
+
 
 #client是我們與Discord連結的橋樑
 client = discord.Client()
+token = db.find_api_token()
+
 
 @client.event
 #當有訊息時
@@ -132,4 +138,4 @@ async def on_message(message):
 
     
     
-client.run('') #TOKEN在剛剛Discord Developer那邊「BOT」頁面裡面 
+client.run(token['token']) #TOKEN在剛剛Discord Developer那邊「BOT」頁面裡面 
