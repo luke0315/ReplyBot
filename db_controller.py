@@ -9,7 +9,10 @@ coll_keyword = db.keyword
 
 
 #新增資料
-#coll_keyword.insert_one({'keyword':'安安 嗨 hi','reply':'吵阿小'}) 
+# coll_keyword.insert_one({'keyword':'一點 一點了欸 好一點 快一點','reply':'一點也不好笑'}) 
+
+#刪除資料
+# coll_keyword.delete_one({'keyword':"綠色 好綠"})
 
 #搜尋token
 def find_api_token():
@@ -21,7 +24,6 @@ def find_keyword_reply(keyWord):
     myKeyword=keyWord
 
     result = coll_keyword.find_one({"keyword":{"$regex":myKeyword}})
-    resultReply = result['reply']
-    return resultReply
+    return result
 
-print(find_keyword_reply('hi')) #測試
+# print(find_keyword_reply('綠色')) #測試
