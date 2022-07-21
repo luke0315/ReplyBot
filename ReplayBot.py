@@ -1,3 +1,4 @@
+from unittest import result
 import discord
 import pymongo
 from pymongo.database import Database
@@ -26,11 +27,9 @@ async def on_message(message):
     if Replymessage:
         print(Replymessage)
         await message.channel.send(Replymessage)'''
-    '''if ('安安' or '嗨') in message.content or ('hi' or 'Hi' or 'HI') in message.content:
-        await message.channel.send('吵阿小')
-    if   '笑死' in message.content:
-        await message.channel.send('笑三小')
-    if   '一點' in message.content:
+    
+    #等輸入資料庫玩在刪
+    ''' if   '一點' in message.content:
         await message.channel.send('一點也不好笑')
     if   'apple'  in message.content:
         await message.channel.send('趕快下船啦幹')
@@ -68,7 +67,7 @@ async def on_message(message):
     if  '此船只應天上有' in message.content :
         await message.channel.send('apple暈船逃不走')
     if  '掰掰' in message.content :
-        await message.channel.send('要滾快滾')
+        await message.channel.send('要滾快滾 :rage: ')
     if  '傑狗' in message.content :
         await message.channel.send('是隻鳥')
     if  '王八' in message.content :
