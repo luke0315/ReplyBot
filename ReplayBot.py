@@ -13,10 +13,20 @@ token = db.find_api_token()
 #當有訊息時
 async def on_message(message):
     
-    print( message.content)
+    #print( message.content)
     if message.author == client.user:
         return
-    if ('安安' or '嗨') in message.content or ('hi' or 'Hi' or 'HI') in message.content:
+    #拆分字串
+    for i in range(0,len(message.content)-1):
+        if db.find_keyword_reply(message.content[i]+message.content[i+1]):
+             await message.channel.send(db.find_keyword_reply(message.content[i]+message.content[i+1]))
+        #await message.channel.send(db.find_keyword_reply(message.content))
+    #不拆分字串
+    '''Replymessage = db.find_keyword(message.content)
+    if Replymessage:
+        print(Replymessage)
+        await message.channel.send(Replymessage)'''
+    '''if ('安安' or '嗨') in message.content or ('hi' or 'Hi' or 'HI') in message.content:
         await message.channel.send('吵阿小')
     if   '笑死' in message.content:
         await message.channel.send('笑三小')
@@ -134,7 +144,8 @@ async def on_message(message):
     if  '外賣' in message.content :
         await message.channel.send('咖哩拌飯')
     if  '吃什麼' in message.content :
-        await message.channel.send('吃自己')
+        await message.channel.send('吃自己')'''
+
 
     
     

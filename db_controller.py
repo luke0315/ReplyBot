@@ -21,7 +21,22 @@ def find_keyword_reply(keyWord):
     myKeyword=keyWord
 
     result = coll_keyword.find_one({"keyword":{"$regex":myKeyword}})
+    
     resultReply = result['reply']
     return resultReply
 
-print(find_keyword_reply('hi')) #測試
+def find_keyword(keyWord):
+    myKeyword=keyWord
+    
+    for i in coll_keyword.find():
+        
+        a=i['keyword']
+        if a in myKeyword:
+            result = coll_keyword.find_one({"keyword":{"$regex":myKeyword}})
+            resultReply = result['reply']
+            print(resultReply)
+            return resultReply
+    
+
+
+
