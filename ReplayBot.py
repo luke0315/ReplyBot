@@ -13,15 +13,18 @@ token = db.find_api_token()
 @client.event
 #當有訊息時
 async def on_message(message):
-    
+    lastmessage=''
     #print( message.content)
     if message.author == client.user:
         return
     #拆分字串
     for i in range(0,len(message.content)-1):
         if db.find_keyword_reply(message.content[i]+message.content[i+1]):
-             await message.channel.send(db.find_keyword_reply(message.content[i]+message.content[i+1]))
-        #await message.channel.send(db.find_keyword_reply(message.content))
+            if lastmessage!= db.find_keyword_reply(message.content[i]+message.content[i+1]):
+                lastmessage=db.find_keyword_reply(message.content[i]+message.content[i+1])
+                await message.channel.send(db.find_keyword_reply(message.content[i]+message.content[i+1]))
+            
+        
     #不拆分字串
     '''Replymessage = db.find_keyword(message.content)
     if Replymessage:
