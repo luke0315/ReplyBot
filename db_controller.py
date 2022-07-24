@@ -32,10 +32,9 @@ def find_keyword(keyWord):
     myKeyword=keyWord
     
     for i in coll_keyword.find():
-        
-        a=i['keyword']
-        if a in myKeyword:
-            result = coll_keyword.find_one({"keyword":{"$regex":myKeyword}})
+        dbkeyword=i['keyword']
+        if dbkeyword in myKeyword:
+            result = coll_keyword.find_one({"keyword":{"$regex":dbkeyword}})
             resultReply = result['reply']
             print(resultReply)
             return resultReply

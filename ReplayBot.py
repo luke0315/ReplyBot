@@ -1,36 +1,68 @@
-from unittest import result
+import asyncio
 import discord
+import requests
+import sys
+import os,time
+from unittest import result
 import pymongo
 from pymongo.database import Database
+import music
 import db_controller as db
-
-
+from discord.ext import commands
+from discord.utils import get
+from discord import FFmpegPCMAudio
+from discord import TextChannel
+from youtube_dl import YoutubeDL
+from dotenv import load_dotenv
+from random import randint
+import sys
 #client是我們與Discord連結的橋樑
-client = discord.Client()
+#client = discord.Client()
 token = db.find_api_token()
+load_dotenv()
+prefix="[" 
+bot = commands.Bot(command_prefix=prefix)
+players = {}
+    
+@bot.event
+async def on_ready():
+    print(">>Bot is online<<")
 
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f'{round(bot.latency*1000)}ms')
 
-@client.event
+#音樂
+@bot.command()
+async def join(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(bot.voice_clients, guild=ctx.guild)
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
+
+@bot.event
 #當有訊息時
 async def on_message(message):
     lastmessage=''
-    #print( message.content)
-    if message.author == client.user:
-        return
-    #拆分字串
-    for i in range(0,len(message.content)-1):
-        if db.find_keyword_reply(message.content[i]+message.content[i+1]):
-            if lastmessage!= db.find_keyword_reply(message.content[i]+message.content[i+1]):
-                lastmessage=db.find_keyword_reply(message.content[i]+message.content[i+1])
-                await message.channel.send(db.find_keyword_reply(message.content[i]+message.content[i+1]))
-            
-        
-    #不拆分字串
-    '''Replymessage = db.find_keyword(message.content)
-    if Replymessage:
-        print(Replymessage)
-        await message.channel.send(Replymessage)'''
+    if message.author == bot.user:
+            return
+    #print( message.content[0])
     
+    if message.content[0]!= '[':
+        #拆分字串
+        '''for i in range(0,len(message.content)-1):
+            if db.find_keyword_reply(message.content[i]+message.content[i+1]):
+                if lastmessage!= db.find_keyword_reply(message.content[i]+message.content[i+1]):
+                    lastmessage=db.find_keyword_reply(message.content[i]+message.content[i+1])
+                    await message.channel.send(db.find_keyword_reply(message.content[i]+message.content[i+1]))'''
+        Replymessage = db.find_keyword(message.content)
+        if Replymessage:
+                print(Replymessage)
+                await message.channel.send(Replymessage)
+    await bot.process_commands(message)     
+
     #等輸入資料庫玩在刪
     ''' if   '一點' in message.content:
         await message.channel.send('一點也不好笑')
@@ -149,6 +181,7 @@ async def on_message(message):
         await message.channel.send('吃自己')'''
 
 
-    
-    
-client.run(token['token']) #TOKEN在剛剛Discord Developer那邊「BOT」頁面裡面 
+         # Initialize the cog and add it to the bot
+   
+bot.add_cog(music.Music(bot, prefix))     
+bot.run(token['token']) #TOKEN在剛剛Discord Developer那邊「BOT」頁面裡面 
