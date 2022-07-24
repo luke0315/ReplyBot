@@ -63,7 +63,7 @@ async def on_message(message):
                 await message.channel.send(Replymessage)
     await bot.process_commands(message)     
 
-    #等輸入資料庫玩在刪
+    ##等輸入資料庫玩在刪
     ''' if   '一點' in message.content:
         await message.channel.send('一點也不好笑')
     if   'apple'  in message.content:
