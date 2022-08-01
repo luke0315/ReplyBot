@@ -1,8 +1,10 @@
 import asyncio
+from turtle import title
 import discord
 import requests
-import sys
 import os,time
+import sys
+import logging
 from unittest import result
 import pymongo
 from pymongo.database import Database
@@ -15,7 +17,7 @@ from discord import TextChannel
 from youtube_dl import YoutubeDL
 from dotenv import load_dotenv
 from random import randint
-import sys
+from video import Video
 #client是我們與Discord連結的橋樑
 #client = discord.Client()
 token = db.find_api_token()
@@ -23,24 +25,18 @@ load_dotenv()
 prefix="[" 
 bot = commands.Bot(command_prefix=prefix)
 players = {}
-    
+urllist=[]
+nowplay=''
 @bot.event
 async def on_ready():
     print(">>Bot is online<<")
 
 @bot.command()
 async def ping(ctx):
+    '''顯示中文'''
     await ctx.send(f'{round(bot.latency*1000)}ms')
 
-#音樂
-@bot.command()
-async def join(ctx):
-    channel = ctx.message.author.voice.channel
-    voice = get(bot.voice_clients, guild=ctx.guild)
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        voice = await channel.connect()
+
 
 @bot.event
 #當有訊息時
@@ -62,9 +58,44 @@ async def on_message(message):
                 print(Replymessage)
                 await message.channel.send(Replymessage)
     await bot.process_commands(message)     
+'''async def playlist(ctx, *, list):
+        """Plays audio hosted at <url> (or performs a search for <url> and plays the first result)."""
+        
+         # get the guild's state
+        if list=='韓':
+            f = open("korean.txt", "r")
+            for i in f:
+                self.urllist.append(i)
+        
+        if ctx.author.voice is not None and ctx.author.voice.channel is not None:
+            channel = ctx.author.voice.channel
+            try:
+                video = Video(url, ctx.author)
+            except youtube_dl.DownloadError as e:
+                await ctx.send(
+                    "There was an error downloading your video, sorry.")
+                return
+            client = await channel.connect()
+            self._play_song(client, state, video)
+            message = await ctx.send("", embed=video.get_embed())
+            await self._add_reaction_controls(message)
+            logging.info(f"Now playing '{video.title}'")
+        else:
+            raise commands.CommandError(
+                "You need to be in a voice channel to do that.")'''
 
+
+
+<<<<<<< HEAD
     ##等輸入資料庫玩在刪
     ''' if   '一點' in message.content:
+=======
+
+
+   
+''' 
+    if   '一點' in message.content:
+>>>>>>> 1c5f290cdbf298afea3ed9184a20e0109a9c062b
         await message.channel.send('一點也不好笑')
     if   'apple'  in message.content:
         await message.channel.send('趕快下船啦幹')
