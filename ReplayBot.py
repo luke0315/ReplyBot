@@ -86,11 +86,16 @@ async def on_message(message):
 
 
 
+<<<<<<< HEAD
+    ##等輸入資料庫玩在刪
+    ''' if   '一點' in message.content:
+=======
 
 
    
 ''' 
     if   '一點' in message.content:
+>>>>>>> 1c5f290cdbf298afea3ed9184a20e0109a9c062b
         await message.channel.send('一點也不好笑')
     if   'apple'  in message.content:
         await message.channel.send('趕快下船啦幹')
