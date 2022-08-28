@@ -7,7 +7,9 @@ import math
 from urllib import request
 from video import Video
 import random 
-
+import functools
+import typing
+from pytube import Playlist
 # TODO: abstract FFMPEG options into their own file?
 FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
 """
@@ -47,11 +49,31 @@ async def is_audio_requester(ctx):
     else:
         raise commands.CommandError(
             "You need to be the song requester to do that.")
-
-
+def to_thread(func: typing.Callable) -> typing.Coroutine:
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        return await asyncio.to_thread(func, *args, **kwargs)
+    return wrapper
+@to_thread
+def addlist(client,state,song):
+            lensong=len(song)
+            for i in range(0,lensong-1):
+                    a=random.choice(song)
+                    song.remove(a)
+                    #url = urllist[randint(0,(len(urllist-1) - 1))]
+                    try:
+                        if a:
+                            video = Video(a, client.author)
+                            print(a,':OK')
+                            state.playlist.append(video)
+                            
+                    except:
+                        pass
 class Music(commands.Cog):
     """Bot commands to help play music."""
+    
 
+    
     def __init__(self, bot, config):
         self.bot = bot
         self.config = config # retrieve module name, find config entry
@@ -192,16 +214,20 @@ class Music(commands.Cog):
     @commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
+        
+        
         state = self.get_state(ctx.guild)
+        
         queuetext=state.playlist[0:20]
-        await ctx.send(self._queue_text(queuetext))
 
-    def _queue_text(self, queue):
+        await ctx.send(self._queue_text(queuetext,state.playlist))
+
+    def _queue_text(self, queue,playlist):
         """Returns a block of text describing a given song queue."""
         
         if len(queue) > 0 :
             
-            message = [f"{len(queue)} songs in queue:"]
+            message = [f"{len(playlist)} songs in queue:"]
             message += [
                 f"  {index+1}. **{song.title}** (requested by **{song.requested_by.name}**)"
                 for (index, song) in enumerate(queue)
@@ -240,15 +266,15 @@ class Music(commands.Cog):
     async def play(self, ctx, *, url):
         """Plays audio hosted at <url> (or performs a search for <url> and plays the first result)."""
         #print(url)
-            
+        
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
         if len(url)==1:
             if '韓' in url:
-                f = open("a.txt", "r",encoding="utf-8")
-            if '日' in url:
+                f = open("korean.txt", "r",encoding="utf-8")
+            elif '日' in url:
                 f = open("芭娜娜ㄉ日文歌.txt", "r",encoding="utf-8")
-            if '中' in url:
+            elif '中' in url:
                 f = open("chinese.txt", "r",encoding="utf-8")
             data = f.read()
             urllist=data.split(',')
@@ -271,18 +297,7 @@ class Music(commands.Cog):
                 message = await ctx.send(
                     "Added to queue.", embed=video.get_embed())
                 await self._add_reaction_controls(message)
-                for i in range(0,50):
-                    a=random.choice(urllist)
-                    urllist.remove(a)
-                    #url = urllist[randint(0,(len(urllist-1) - 1))]
-                    try:
-                        if a:
-                            print(a,':OK')
-                            video = Video(a, ctx.author)
-                            #print(video,':OK')
-                            state.playlist.append(video)
-                    except:
-                        pass
+                await addlist(ctx,state,urllist)
                 await ctx.send("歌單加入完畢")
             
             
@@ -307,23 +322,57 @@ class Music(commands.Cog):
                 message = await ctx.send("", embed=video.get_embed())
                 await self._add_reaction_controls(message)
                 logging.info(f"Now playing '{video.title}'")
-                for i in range(0,50):
-                    a=random.choice(urllist)
-                    urllist.remove(a)
-                    #url = urllist[randint(0,(len(urllist-1) - 1))]
-                    try:
-                        if a:
-                            print(a,':OK')
-                            video = Video(a, ctx.author)
-                            #print(video,':OK')
-                            state.playlist.append(video)
-                    except:
-                        pass
+                await addlist(ctx,state,urllist)
+                print('OK')
                 await ctx.send("歌單加入完畢")
+        elif 'list' in url:
+            urllist=[]
+            p=Playlist(url)
+            if client and client.channel:
+                try:
+                    with youtube_dl.YoutubeDL() as ydl:
+                        for a in p:
+                            urllist.append(a)
+                except youtube_dl.DownloadError as e:
+                    logging.warn(f"Error downloading video: {e}")
+                    await ctx.send(
+                        "There was an error downloading your video, sorry.")
+                    return
+
+                message = await ctx.send(
+                    "Added to queue.", embed=video.get_embed())
+                await self._add_reaction_controls(message)
+                await addlist(ctx,state,urllist)
+            else:
+                if ctx.author.voice is not None and ctx.author.voice.channel is not None:
+                    channel = ctx.author.voice.channel
+                    try:
+                        a=p[0]
+                        video = Video(a, ctx.author)
+                        client = await channel.connect()
+                        self._play_song(client, state, video)
+                        
+                        for a in p:
+                            urllist.append(a)
+                            print(a)
+                        
+                    except youtube_dl.DownloadError as e:
+                        await ctx.send(
+                            "There was an error downloading your video, sorry.")
+                        return
+                    
+                    message = await ctx.send("", embed=video.get_embed())
+                    await self._add_reaction_controls(message)
+                    logging.info(f"Now playing '{video.title}'")
+                    await addlist(ctx,state,urllist)
+                else:
+                    raise commands.CommandError(
+                        "You need to be in a voice channel to do that.")
         else:
             if client and client.channel:
                 try:
                     video = Video(url, ctx.author)
+                    
                 except youtube_dl.DownloadError as e:
                     logging.warn(f"Error downloading video: {e}")
                     await ctx.send(

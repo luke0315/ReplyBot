@@ -33,7 +33,7 @@ async def on_ready():
 
 @bot.command()
 async def ping(ctx):
-    '''顯示中文'''
+    '''顯示PING'''
     await ctx.send(f'{round(bot.latency*1000)}ms')
 
 
