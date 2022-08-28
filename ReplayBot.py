@@ -82,22 +82,9 @@ async def on_message(message):
             logging.info(f"Now playing '{video.title}'")
         else:
             raise commands.CommandError(
-                "You need to be in a voice channel to do that.")'''
+                "You need to be in a voice channel to do that.")
 
 
-
-<<<<<<< HEAD
-    ##等輸入資料庫玩在刪
-    ''' if   '一點' in message.content:
-=======
-
-
-   
-''' 
-    if   '一點' in message.content:
->>>>>>> 1c5f290cdbf298afea3ed9184a20e0109a9c062b
-        await message.channel.send('一點也不好笑')
-    if   'apple'  in message.content:
         await message.channel.send('趕快下船啦幹')
     if  '完美' in message.content :
         await message.channel.send('Pofee啦')
